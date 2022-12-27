@@ -30,7 +30,7 @@ class Batch:
         self.sku = sku
         self.eta = eta
         self._purchased_quantity = qty
-        self._allocations = set()  # type: Set[OrderLine]
+        self._allocations: Set[OrderLine] = set()
 
     def __repr__(self):
         return f"<Batch {self.reference}>"
@@ -43,12 +43,12 @@ class Batch:
     def __hash__(self):
         return hash(self.reference)
 
-    def __gt__(self, other):
+    def __lt__(self, other):
         if self.eta is None:
-            return False
-        if other.eta is None:
             return True
-        return self.eta > other.eta
+        if other.eta is None:
+            return False
+        return self.eta < other.eta
 
     def allocate(self, line: OrderLine):
         if self.can_allocate(line):
