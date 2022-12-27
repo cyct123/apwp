@@ -59,6 +59,14 @@ class Batch:
             self._allocations.remove(line)
 
     @property
+    def allocations(self) -> Set[OrderLine]:
+        return self._allocations
+
+    @property
+    def purchased_quantity(self) -> int:
+        return self._purchased_quantity
+
+    @property
     def allocated_quantity(self) -> int:
         return sum(line.qty for line in self._allocations)
 
