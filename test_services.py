@@ -1,7 +1,9 @@
 import pytest
+
 import model
 import repository
 import services
+from services import DoNotExist, InvalidSku
 
 
 class FakeRepository(repository.AbstractRepository):
@@ -16,6 +18,14 @@ class FakeRepository(repository.AbstractRepository):
 
     def list(self):
         return list(self._batches)
+
+    def get_order_line(self, orderid, sku) -> model.OrderLine:
+        return next(
+            line
+            for b in self._batches
+            for line in b.allocations
+            if line.orderid == orderid and line.sku == sku
+        )
 
 
 class FakeSession:
@@ -61,14 +71,27 @@ def test_deallocate_decrements_available_quantity():
     services.allocate(line, repo, session)
     batch = repo.get(reference="b1")
     assert batch.available_quantity == 90
-    # services.deallocate(...
-    ...
+    services.deallocate("o1", "BLUE-PLINTH", repo, session)
     assert batch.available_quantity == 100
 
 
 def test_deallocate_decrements_correct_quantity():
-    ...  #  TODO - check that we decrement the right sku
+    #  TODO - check that we decrement the right sku
+    repo, session = FakeRepository([]), FakeSession()
+    services.add_batch("b1", "BLUE-PLINTH", 100, None, repo, session)
+    line = model.OrderLine("o1", "BLUE-PLINTH", 10)
+    services.allocate(line, repo, session)
+    with pytest.raises(InvalidSku, match="WHITE-PLINTH"):
+        services.deallocate("o1", "WHITE-PLINTH", repo, session)
+    batch = repo.get(reference="b1")
+    assert batch.available_quantity == 90
 
 
 def test_trying_to_deallocate_unallocated_batch():
-    ...  #  TODO: should this error or pass silently? up to you.
+    #  TODO: should this error or pass silently? up to you.
+    repo, session = FakeRepository([]), FakeSession()
+    services.add_batch("b1", "BLUE-PLINTH", 100, None, repo, session)
+    with pytest.raises(DoNotExist, match="o1"):
+        services.deallocate("o1", "BLUE-PLINTH", repo, session)
+    batch = repo.get(reference="b1")
+    assert batch.available_quantity == 100

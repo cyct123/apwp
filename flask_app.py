@@ -8,7 +8,6 @@ import orm
 import repository
 import services
 
-
 orm.start_mappers()
 get_session = sessionmaker(bind=create_engine(config.get_postgres_uri()))
 app = Flask(__name__)
@@ -27,6 +26,35 @@ def allocate_endpoint():
     try:
         batchref = services.allocate(line, repo, session)
     except (model.OutOfStock, services.InvalidSku) as e:
+        return {"message": str(e)}, 400
+
+    return {"batchref": batchref}, 201
+
+
+@app.route("/batch", methods=["post"])
+def batch_endpoint():
+    session = get_session()
+    repo = repository.SqlAlchemyRepository(session)
+    services.add_batch(
+        request.json["ref"],
+        request.json["sku"],
+        request.json["qty"],
+        request.json["eta"],
+        repo,
+        session,
+    )
+    return {"batchref": request.json["ref"]}, 201
+
+
+@app.route("/deallocate", methods=["POST"])
+def deallocate_endpoint():
+    session = get_session()
+    repo = repository.SqlAlchemyRepository(session)
+    orderid = request.json["orderid"]
+    sku = request.json["sku"]
+    try:
+        batchref = services.deallocate(orderid, sku, repo, session)
+    except (model.DoNotContain, services.InvalidSku, services.DoNotExist) as e:
         return {"message": str(e)}, 400
 
     return {"batchref": batchref}, 201
