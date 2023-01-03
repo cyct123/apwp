@@ -1,11 +1,10 @@
 from datetime import datetime
-from flask import Flask, request
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from allocation.domain import model
-from allocation.adapters import orm
-from allocation.service_layer import services, unit_of_work
+from flask import Flask, request
+
+from src.allocation.adapters import orm
+from src.allocation.domain import model
+from src.allocation.service_layer import services, unit_of_work
 
 app = Flask(__name__)
 orm.start_mappers()
@@ -33,7 +32,7 @@ def allocate_endpoint():
             request.json["orderid"],
             request.json["sku"],
             request.json["qty"],
-            unit_of_work.SqlAlchemyUnitOfWork(),
+            unit_of_work.SqlAlchemyUnitOfWork(unit_of_work.DEFAULT_SESSION_FACTORY),
         )
     except (model.OutOfStock, services.InvalidSku) as e:
         return {"message": str(e)}, 400

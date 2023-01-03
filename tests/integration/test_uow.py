@@ -1,6 +1,7 @@
 import pytest
-from allocation.domain import model
-from allocation.service_layer import unit_of_work
+
+from src.allocation.domain import model
+from src.allocation.service_layer import unit_of_work
 
 
 def insert_batch(session, ref, sku, qty, eta):
@@ -29,25 +30,22 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(session_factory):
     insert_batch(session, "batch1", "HIPSTER-WORKBENCH", 100, None)
     session.commit()
 
-    pytest.fail("decide what your UoW looks like first?")
     # either:
-    # uow = unit_of_work.SqlAlchemyUnitOfWork(session_factory)
-    # with uow:
+    uow = unit_of_work.SqlAlchemyUnitOfWork(session_factory)
+    with uow:
 
-    # or perhaps
-    # with unit_of_work.start(session_factory) as uow: ?
+        # or perhaps
+        # with unit_of_work.start(session_factory) as uow: ?
 
-    #     batch = uow.batches.get(reference='batch1')
-    #     line = model.OrderLine('o1', 'HIPSTER-WORKBENCH', 10)
-    #     batch.allocate(line)
-    #     uow.commit()
+        batch = uow.batches.get(reference="batch1")
+        line = model.OrderLine("o1", "HIPSTER-WORKBENCH", 10)
+        batch.allocate(line)
+        uow.commit()
 
     batchref = get_allocated_batch_ref(session, "o1", "HIPSTER-WORKBENCH")
     assert batchref == "batch1"
 
 
-"""
-# uncomment and fix these when ready
 def test_rolls_back_uncommitted_work_by_default(session_factory):
     uow = unit_of_work.SqlAlchemyUnitOfWork(session_factory)
     with uow:
@@ -71,4 +69,3 @@ def test_rolls_back_on_error(session_factory):
     new_session = session_factory()
     rows = list(new_session.execute('SELECT * FROM "batches"'))
     assert rows == []
-"""

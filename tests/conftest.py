@@ -5,12 +5,12 @@ from pathlib import Path
 import pytest
 import requests
 from requests.exceptions import ConnectionError
-from sqlalchemy.exc import OperationalError
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, clear_mappers
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import clear_mappers, sessionmaker
 
-from allocation.adapters.orm import metadata, start_mappers
-from allocation import config
+from src.allocation import config
+from src.allocation.adapters.orm import metadata, start_mappers
 
 
 @pytest.fixture

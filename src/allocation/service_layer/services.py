@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import Optional
-from datetime import date
 
-from allocation.domain import model
-from allocation.domain.model import OrderLine
-from allocation.service_layer import unit_of_work
+from datetime import date
+from typing import Optional
+
+from src.allocation.domain import model
+from src.allocation.domain.model import OrderLine
+from src.allocation.service_layer import unit_of_work
 
 
 class InvalidSku(Exception):
@@ -20,10 +21,8 @@ def add_batch(
     sku: str,
     qty: int,
     eta: Optional[date],
-    uow  #: unit_of_work.AbstractUnitOfWork
-    # this argument could be start_uow: AbstractUnitOfWorkStarter instead?
+    uow: unit_of_work.AbstractUnitOfWork,
 ):
-    # and this could be with start_uow() as uow:
     with uow:
         uow.batches.add(model.Batch(ref, sku, qty, eta))
         uow.commit()
