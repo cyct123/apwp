@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import Optional
-from datetime import date
 
-from allocation.domain import model
-from allocation.domain.model import OrderLine
-from allocation.service_layer import unit_of_work
+from datetime import date
+from typing import Optional
+
+from src.allocation.domain import model
+from src.allocation.domain.model import OrderLine
+from src.allocation.service_layer import unit_of_work
 
 
 class InvalidSku(Exception):
@@ -23,7 +24,11 @@ def add_batch(
     uow: unit_of_work.AbstractUnitOfWork,
 ):
     with uow:
-        uow.batches.add(model.Batch(ref, sku, qty, eta))
+        product = uow.products.get(sku)
+        if product is None:
+            product = model.Product(sku, [])
+            uow.products.add(product)
+        product.batches.append(model.Batch(ref, sku, qty, eta))
         uow.commit()
 
 
@@ -35,9 +40,9 @@ def allocate(
 ) -> str:
     line = OrderLine(orderid, sku, qty)
     with uow:
-        batches = uow.batches.list()
-        if not is_valid_sku(line.sku, batches):
-            raise InvalidSku(f"Invalid sku {line.sku}")
-        batchref = model.allocate(line, batches)
+        product = uow.products.get(sku)
+        if product is None:
+            raise InvalidSku(f"Invalid sku {sku}")
+        batchref = product.allocate(line)
         uow.commit()
     return batchref
