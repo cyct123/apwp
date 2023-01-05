@@ -1,0 +1,24 @@
+from src.allocation.domain import events
+
+
+class Email:
+    @staticmethod
+    def send_mail(address, message):
+        print(f"{address} {message}")
+
+
+def handle(event: events.Event):
+    for handler in HANDLERS[type(event)]:
+        handler(event)
+
+
+def send_out_of_stock_notification(event: events.OutOfStock):
+    Email.send_mail(
+        "stock@made.com",
+        f"Out of stock for {event.sku}",
+    )
+
+
+HANDLERS = {
+    events.OutOfStock: [send_out_of_stock_notification],
+}

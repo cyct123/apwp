@@ -1,12 +1,16 @@
 # pylint: disable=attribute-defined-outside-init
 from __future__ import annotations
+
 import abc
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-from allocation import config
-from allocation.adapters import repository
+from src.allocation import config
+from src.allocation.adapters import repository
+
+from . import message_bus
 
 
 class AbstractUnitOfWork(abc.ABC):
@@ -18,8 +22,18 @@ class AbstractUnitOfWork(abc.ABC):
     def __exit__(self, *args):
         self.rollback()
 
-    @abc.abstractmethod
     def commit(self):
+        self._commit()
+        self.publish_events()
+
+    def publish_events(self):
+        for product in self.products.seen:
+            while product.events:
+                event = product.events.pop()
+                message_bus.handle(event)
+
+    @abc.abstractmethod
+    def _commit(self):
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -48,7 +62,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         super().__exit__(*args)
         self.session.close()
 
-    def commit(self):
+    def _commit(self):
         self.session.commit()
 
     def rollback(self):
