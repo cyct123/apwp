@@ -1,5 +1,6 @@
-from typing import Set, Protocol
-from allocation.domain import model
+from typing import Protocol, Set
+
+from src.allocation.domain import model
 
 
 class AbstractRepository(Protocol):

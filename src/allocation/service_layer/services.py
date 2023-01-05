@@ -1,9 +1,10 @@
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
-from datetime import date
 
-from allocation.domain import model
-from allocation.domain.model import OrderLine
+from datetime import date
+from typing import TYPE_CHECKING, Optional
+
+from src.allocation.domain import model
+from src.allocation.domain.model import OrderLine
 
 if TYPE_CHECKING:
     from . import unit_of_work
