@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
-from allocation.adapters import email
-from allocation.domain import events, model
-from allocation.domain.model import OrderLine
+
+from src.allocation.adapters import email
+from src.allocation.domain import events, model
+from src.allocation.domain.model import OrderLine
 
 if TYPE_CHECKING:
     from . import unit_of_work
@@ -21,9 +23,7 @@ def add_batch(
         if product is None:
             product = model.Product(event.sku, batches=[])
             uow.products.add(product)
-        product.batches.append(
-            model.Batch(event.ref, event.sku, event.qty, event.eta)
-        )
+        product.batches.append(model.Batch(event.ref, event.sku, event.qty, event.eta))
         uow.commit()
 
 
