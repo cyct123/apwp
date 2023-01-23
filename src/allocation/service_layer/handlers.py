@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
-from allocation.adapters import email
-from allocation.domain import commands, events, model
-from allocation.domain.model import OrderLine
+
+from src.allocation.adapters import email
+from src.allocation.domain import commands, events, model
+from src.allocation.domain.model import OrderLine
 
 if TYPE_CHECKING:
     from . import unit_of_work

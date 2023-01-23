@@ -1,10 +1,12 @@
 # pylint: disable=no-self-use
 from datetime import date
 from unittest import mock
+
 import pytest
-from allocation.adapters import repository
-from allocation.domain import commands, events
-from allocation.service_layer import handlers, messagebus, unit_of_work
+
+from src.allocation.adapters import repository
+from src.allocation.domain import commands
+from src.allocation.service_layer import handlers, messagebus, unit_of_work
 
 
 class FakeRepository(repository.AbstractRepository):
@@ -75,19 +77,15 @@ class TestAllocate:
 
     def test_commits(self):
         uow = FakeUnitOfWork()
-        messagebus.handle(
-            commands.CreateBatch("b1", "OMINOUS-MIRROR", 100, None), uow
-        )
+        messagebus.handle(commands.CreateBatch("b1", "OMINOUS-MIRROR", 100, None), uow)
         messagebus.handle(commands.Allocate("o1", "OMINOUS-MIRROR", 10), uow)
         assert uow.committed
 
     def test_sends_email_on_out_of_stock_error(self):
         uow = FakeUnitOfWork()
-        messagebus.handle(
-            commands.CreateBatch("b1", "POPULAR-CURTAINS", 9, None), uow
-        )
+        messagebus.handle(commands.CreateBatch("b1", "POPULAR-CURTAINS", 9, None), uow)
 
-        with mock.patch("allocation.adapters.email.send") as mock_send_mail:
+        with mock.patch("src.allocation.adapters.email.send") as mock_send_mail:
             messagebus.handle(commands.Allocate("o1", "POPULAR-CURTAINS", 10), uow)
             assert mock_send_mail.call_args == mock.call(
                 "stock@made.com", f"Out of stock for POPULAR-CURTAINS"

@@ -1,8 +1,11 @@
 # pylint: disable=broad-except
 from __future__ import annotations
+
 import logging
-from typing import List, Dict, Callable, Type, Union, TYPE_CHECKING
-from allocation.domain import commands, events
+from typing import TYPE_CHECKING, Callable, Dict, List, Type, Union
+
+from src.allocation.domain import commands, events
+
 from . import handlers
 
 if TYPE_CHECKING:
