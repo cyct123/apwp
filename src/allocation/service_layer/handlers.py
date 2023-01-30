@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from src.allocation.adapters import email
 from src.allocation.domain import commands, events, model
 from src.allocation.domain.model import OrderLine
+from src.allocation.entrypoints import redis_eventpublisher
 
 if TYPE_CHECKING:
     from . import unit_of_work
@@ -59,3 +60,10 @@ def send_out_of_stock_notification(
         "stock@made.com",
         f"Out of stock for {event.sku}",
     )
+
+
+def publish_allocated_event(
+    event: events.Allocated,
+    uow: unit_of_work.AbstractUnitOfWork,
+):
+    redis_eventpublisher.publish("line_allocated", event)

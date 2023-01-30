@@ -77,13 +77,17 @@ class TestAllocate:
 
     def test_commits(self):
         uow = FakeUnitOfWork()
-        messagebus.handle(commands.CreateBatch("b1", "OMINOUS-MIRROR", 100, None), uow)
+        messagebus.handle(
+            commands.CreateBatch("b1", "OMINOUS-MIRROR", 100, None), uow
+        )
         messagebus.handle(commands.Allocate("o1", "OMINOUS-MIRROR", 10), uow)
         assert uow.committed
 
     def test_sends_email_on_out_of_stock_error(self):
         uow = FakeUnitOfWork()
-        messagebus.handle(commands.CreateBatch("b1", "POPULAR-CURTAINS", 9, None), uow)
+        messagebus.handle(
+            commands.CreateBatch("b1", "POPULAR-CURTAINS", 9, None), uow
+        )
 
         with mock.patch("src.allocation.adapters.email.send") as mock_send_mail:
             messagebus.handle(commands.Allocate("o1", "POPULAR-CURTAINS", 10), uow)
