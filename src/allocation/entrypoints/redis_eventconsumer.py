@@ -8,6 +8,8 @@ from allocation.adapters import orm
 from allocation.domain import commands
 from allocation.service_layer import messagebus, unit_of_work
 
+logger = logging.getLogger(__name__)
+
 r = redis.Redis(**config.get_redis_host_and_port())
 
 

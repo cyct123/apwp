@@ -2,10 +2,10 @@ from datetime import datetime
 
 from flask import Flask, request
 
-from src.allocation.adapters import orm
-from src.allocation.domain import commands
-from src.allocation.service_layer import messagebus, unit_of_work
-from src.allocation.service_layer.handlers import InvalidSku
+from allocation.adapters import orm
+from allocation.domain import commands
+from allocation.service_layer import messagebus, unit_of_work
+from allocation.service_layer.handlers import InvalidSku
 
 app = Flask(__name__)
 orm.start_mappers()

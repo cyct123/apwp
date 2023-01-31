@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src.allocation.adapters import email
-from src.allocation.domain import commands, events, model
-from src.allocation.domain.model import OrderLine
-from src.allocation.entrypoints import redis_eventpublisher
+from allocation.adapters import email
+from allocation.domain import commands, events, model
+from allocation.domain.model import OrderLine
+from allocation.entrypoints import redis_eventpublisher
 
 if TYPE_CHECKING:
     from . import unit_of_work

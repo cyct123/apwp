@@ -6,8 +6,8 @@ from typing import List
 
 import pytest
 
-from src.allocation.domain import model
-from src.allocation.service_layer import unit_of_work
+from allocation.domain import model
+from allocation.service_layer import unit_of_work
 
 from ..random_refs import random_batchref, random_orderid, random_sku
 
