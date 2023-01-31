@@ -8,11 +8,11 @@ import pytest
 import redis
 import requests
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, clear_mappers
+from sqlalchemy.orm import clear_mappers, sessionmaker
 from tenacity import retry, stop_after_delay
 
-from allocation.adapters.orm import metadata, start_mappers
 from allocation import config
+from allocation.adapters.orm import metadata, start_mappers
 
 
 @pytest.fixture
@@ -23,15 +23,15 @@ def in_memory_db():
 
 
 @pytest.fixture
-def session_factory(in_memory_db):
+def sqlite_session_factory(in_memory_db):
     start_mappers()
     yield sessionmaker(bind=in_memory_db)
     clear_mappers()
 
 
 @pytest.fixture
-def session(session_factory):
-    return session_factory()
+def session(sqlite_session_factory):
+    return sqlite_session_factory()
 
 
 @retry(stop=stop_after_delay(10))
