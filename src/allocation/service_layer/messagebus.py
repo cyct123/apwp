@@ -40,7 +40,7 @@ def handle_event(
     for handler in EVENT_HANDLERS[type(event)]:
         try:
             logger.debug("handling event %s with handler %s", event, handler)
-            handler(event, uow=uow)
+            handler(event, uow)
             queue.extend(uow.collect_new_events())
         except Exception:
             logger.exception("Exception handling event %s", event)
@@ -55,7 +55,7 @@ def handle_command(
     logger.debug("handling command %s", command)
     try:
         handler = COMMAND_HANDLERS[type(command)]
-        handler(command, uow=uow)
+        handler(command, uow)
         queue.extend(uow.collect_new_events())
     except Exception:
         logger.exception("Exception handling command %s", command)

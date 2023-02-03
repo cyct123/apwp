@@ -89,3 +89,9 @@ def restart_redis_pubsub():
         ["docker-compose", "restart", "-t", "0", "redis_pubsub"],
         check=True,
     )
+
+
+@pytest.fixture
+def flush_redis_keys():
+    r = redis.Redis(**config.get_redis_host_and_port())
+    return r.flushall()
