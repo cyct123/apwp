@@ -12,7 +12,7 @@ app = Flask(__name__)
 orm.start_mappers()
 
 
-@app.route("/add_batch", methods=["POST"])
+@app.route("/batches", methods=["POST"])
 def add_batch():
     eta = request.json["eta"]
     if eta is not None:
@@ -25,22 +25,21 @@ def add_batch():
     return "OK", 201
 
 
-@app.route("/allocate", methods=["POST"])
+@app.route("/allocations", methods=["POST"])
 def allocate_endpoint():
     try:
         cmd = commands.Allocate(
             request.json["orderid"], request.json["sku"], request.json["qty"]
         )
         uow = unit_of_work.SqlAlchemyUnitOfWork()
-        results = messagebus.handle(cmd, uow)
-        batchref = results.pop(0)
+        messagebus.handle(cmd, uow)
     except InvalidSku as e:
         return {"message": str(e)}, 400
 
-    return {"batchref": batchref}, 201
+    return "OK", 202
 
 
-@app.route("/allocations/<orderid>", method=["GET"])
+@app.route("/allocations/<orderid>", methods=["GET"])
 def allocations_view_endpoint(orderid):
     uow = unit_of_work.SqlAlchemyUnitOfWork()
     result = views.allocations(orderid, uow)

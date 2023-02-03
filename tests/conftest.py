@@ -14,6 +14,8 @@ from tenacity import retry, stop_after_delay
 from allocation import config
 from allocation.adapters.orm import metadata, start_mappers
 
+pytest.register_assert_rewrite("tests.e2e.api_client")
+
 
 @pytest.fixture
 def in_memory_db():
@@ -30,7 +32,7 @@ def sqlite_session_factory(in_memory_db):
 
 
 @pytest.fixture
-def session(sqlite_session_factory):
+def sqlite_session(sqlite_session_factory):
     return sqlite_session_factory()
 
 

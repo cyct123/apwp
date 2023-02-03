@@ -1,17 +1,7 @@
-from sqlalchemy import (
-    Table,
-    MetaData,
-    Column,
-    Integer,
-    String,
-    Date,
-    ForeignKey,
-    event,
-)
+from sqlalchemy import Column, Date, ForeignKey, Integer, MetaData, String, Table, event
 from sqlalchemy.orm import mapper, relationship
 
 from allocation.domain import model
-
 
 metadata = MetaData()
 
@@ -47,6 +37,14 @@ allocations = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("orderline_id", ForeignKey("order_lines.id")),
     Column("batch_id", ForeignKey("batches.id")),
+)
+
+allocations_views = Table(
+    "allocations_view",
+    metadata,
+    Column("orderid", String(255)),
+    Column("sku", String(255)),
+    Column("batchref", String(255)),
 )
 
 

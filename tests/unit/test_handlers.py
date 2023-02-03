@@ -1,7 +1,9 @@
 # pylint: disable=no-self-use
 from datetime import date
 from unittest import mock
+
 import pytest
+
 from allocation.adapters import repository
 from allocation.domain import commands, events
 from allocation.service_layer import handlers, messagebus, unit_of_work
@@ -65,10 +67,7 @@ class TestAllocate:
         messagebus.handle(
             commands.CreateBatch("batch1", "COMPLICATED-LAMP", 100, None), uow
         )
-        results = messagebus.handle(
-            commands.Allocate("o1", "COMPLICATED-LAMP", 10), uow
-        )
-        assert results.pop(0) == "batch1"
+        messagebus.handle(commands.Allocate("o1", "COMPLICATED-LAMP", 10), uow)
         [batch] = uow.products.get("COMPLICATED-LAMP").batches
         assert batch.available_quantity == 90
 
@@ -81,17 +80,13 @@ class TestAllocate:
 
     def test_commits(self):
         uow = FakeUnitOfWork()
-        messagebus.handle(
-            commands.CreateBatch("b1", "OMINOUS-MIRROR", 100, None), uow
-        )
+        messagebus.handle(commands.CreateBatch("b1", "OMINOUS-MIRROR", 100, None), uow)
         messagebus.handle(commands.Allocate("o1", "OMINOUS-MIRROR", 10), uow)
         assert uow.committed
 
     def test_sends_email_on_out_of_stock_error(self):
         uow = FakeUnitOfWork()
-        messagebus.handle(
-            commands.CreateBatch("b1", "POPULAR-CURTAINS", 9, None), uow
-        )
+        messagebus.handle(commands.CreateBatch("b1", "POPULAR-CURTAINS", 9, None), uow)
 
         with mock.patch("allocation.adapters.email.send") as mock_send_mail:
             messagebus.handle(commands.Allocate("o1", "POPULAR-CURTAINS", 10), uow)
